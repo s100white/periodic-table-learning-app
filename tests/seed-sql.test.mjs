@@ -34,3 +34,12 @@ test('시드 SQL은 트랜잭션과 충돌 갱신을 포함한다', () => {
   assert.match(sql, /"group"/);
   assert.match(sql, /lanthanoid_position/);
 });
+
+test('숫자 속성의 설명형 누락값은 SQL null로 변환한다', () => {
+  const sql = createSeedSql(fallbackElements, fallbackComparisonNotes);
+  const heliumRow = sql.split('\n').find((line) => line.includes("'He', '헬륨'"));
+
+  assert.ok(heliumRow);
+  assert.match(heliumRow, /'1s2', null, array\['0'\]::text\[\]/);
+  assert.doesNotMatch(heliumRow, /'해당 없음'/);
+});

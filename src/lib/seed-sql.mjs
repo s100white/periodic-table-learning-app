@@ -25,6 +25,22 @@ const elementFields = [
   ['actinoid_position', 'actinoidPosition'],
 ];
 
+const numericElementFields = new Set([
+  'id',
+  'atomic_number',
+  'atomic_mass',
+  'period',
+  'group',
+  'electronegativity',
+  'atomic_radius',
+  'first_ionization_energy',
+  'melting_point',
+  'boiling_point',
+  'density',
+  'lanthanoidPosition',
+  'actinoidPosition',
+]);
+
 function sqlValue(value) {
   if (value === null || value === undefined || value === '') return 'null';
   if (Array.isArray(value)) {
@@ -32,6 +48,14 @@ function sqlValue(value) {
   }
   if (typeof value === 'number') return String(value);
   return `'${String(value).replaceAll("'", "''")}'`;
+}
+
+function elementSqlValue(key, value) {
+  if (numericElementFields.has(key) && (typeof value !== 'number' || !Number.isFinite(value))) {
+    return 'null';
+  }
+
+  return sqlValue(value);
 }
 
 export function validateSeedData(elements, notes) {
@@ -75,7 +99,7 @@ export function createSeedSql(elements, notes) {
   validateSeedData(elements, notes);
 
   const elementRows = elements.map((element) =>
-    elementFields.map(([, key]) => sqlValue(element[key])),
+    elementFields.map(([, key]) => elementSqlValue(key, element[key])),
   );
   const exampleRows = elements.flatMap((element) =>
     element.examples.map((example) => [
