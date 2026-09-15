@@ -9,3 +9,4 @@ dist
 coverage
 *.tmp.*
 KGM-품질검사-자동화/
+.worktrees/
